@@ -42,3 +42,38 @@
 
   </body>
 </html>
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonValueWithoutQuotes {
+    public static void main(String[] args) throws Exception {
+        String jsonString = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+
+        // Parse the JSON string into a JsonNode
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+        // Process the JsonNode to remove quotes from values
+        processJsonNode(jsonNode);
+
+        // Convert the JsonNode back to a JSON string
+        String modifiedJsonString = objectMapper.writeValueAsString(jsonNode);
+        System.out.println(modifiedJsonString);
+    }
+
+    private static void processJsonNode(JsonNode node) {
+        if (node.isObject()) {
+            // If it's an object node, recursively process its children
+            node.fields().forEachRemaining(entry -> processJsonNode(entry.getValue()));
+        } else if (node.isTextual()) {
+            // If it's a textual node (string value), remove the quotes
+            String value = node.asText();
+            ((com.fasterxml.jackson.databind.node.TextNode) node).textNode(value);
+        }
+        // Add any additional checks for other types of nodes if needed
+    }
+}
+
+
